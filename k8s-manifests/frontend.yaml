@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+  namespace: clojure
+  labels:
+    app: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: belyklarry/clj-frontend:latest
+        imagePullPolicy: IfNotPresent
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8080
+        env:
+        - name: STATIC_URL
+          value: http://0.0.0.0:8000/
+        - name: QUOTE_SERVICE_URL
+          value: http://10.100.53.174:8070
+        - name: NEWSFEED_SERVICE_URL
+          value: http://10.103.20.165:8090
+        - name: NEWSFEED_SERVICE_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: authentication-token
+              key: token
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: clojure
+spec:
+  type: LoadBalancer
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080

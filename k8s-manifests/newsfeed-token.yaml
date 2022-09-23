@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: Secret
-metadata:
-    name: authentication-token
-    namespace: clojure
-type: Opaque
-data:
-    token: VDEmZVdiWVhOV0cxdzFeWUdLRFB4QVdKQF5ldF4ma1gK
